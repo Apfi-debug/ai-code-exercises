@@ -203,65 +203,29 @@ The journal shows my progression from “just reading code” to “understandin
 
 This exercise taught me how to systematically explore, question, and document a codebase.
 
-# Exercise: Algorithm Deconstruction Challenge
+## Exercise: Algorithm Deconstruction Challenge
 
-# Chosen Algorithm
--Task priority sorting in JavaScript.
+### Algorithm Chosen
+Task priority sorting in JavaScript (calculateTaskScore, sortTasksByImportance, getTopPriorityTasks).
 
--Functions: calculateTaskScore,    sortTasksByImportance, getTopPriorityTasks.
- 
- 1. The algorithm assigns a numeric score to each task using multiple factors:
+### Key Understanding
+- Weighted scoring system combining priority, due date, status, tags, and recent updates.
+- Produces a numeric score for each task, then sorts and slices top N.
 
--Priority weights (LOW → URGENT).
+### Worked Example (Scores)
+- Fix login bug → 83
+- Submit financial report → 63
+- Update project roadmap → 25
+- Team meeting notes → 5
 
--Due date factor (overdue, today, next 2 days, next week).
+Sorted output: Fix login bug, Submit financial report, Update project roadmap, Team meeting notes.
 
--Status adjustment (DONE, REVIEW).
+### Insights
+- Multi-factor scoring, deadline sensitivity, noise reduction, extensibility.
 
--Tag boost (blocker, critical, urgent).
-
--Recent update boost (updated within 1 day).
-
-2. Tasks are then sorted by score, and the top N are returned.
-
-# Worked example
-Fix login bug → 83
-
-Submit financial report → 63
-
-Update project roadmap → 25
-
-Team meeting notes → 5
-
-// Example tasks for scoring
-Submit financial report → HIGH, due today, critical tag  
-Fix login bug → URGENT, overdue, blocker tag  
-Team meeting notes → LOW, due in 5 days, REVIEW  
-Update project roadmap → MEDIUM, no due date, updated today
-
-Sorted Output
-
-Fix login bug
-Submit financial report
-Update project roadmap
-Team meeting notes
- 
-# Insights
-It’s a multi-factor scoring system, not just a simple sort.
-
-Urgent and overdue tasks rise sharply.
-
-Completed/review tasks are heavily penalized to reduce noise.
-
-Extensible: weights and signals can be adjusted or expanded.
-
-# Reflection Summary
-AI explanation impact → Clarified how each factor contributes numerically, not just conceptually.
-
-Remaining difficulties → Edge cases (no due date, conflicting signals, multiple tags).
-
-Explaining to juniors → “We give each task points based on urgency, deadline, and tags, then sort them so the highest points float to the top.”
-
-Testing understanding → Confirmed with worked example scores.
-
-Possible improvements → Configurable weights, handling recurring tasks, adaptive scoring with ML.
+### Reflection Summary
+1. AI explanation clarified numeric contributions.
+2. Difficulties: edge cases (no due date, conflicting signals, multiple tags).
+3. Junior dev explanation: “Give each task points, sort by highest.”
+4. Tested with worked example scores.
+5. Improvements: configurable weights, recurring tasks, adaptive scoring.
