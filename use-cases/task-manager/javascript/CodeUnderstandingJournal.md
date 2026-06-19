@@ -73,7 +73,7 @@ Based on my search, these files might be relevant, but I'm not sure:
 
 ### What Guided Questions Revealed
 - Priority is passed from CLI input into `app.js` when creating tasks.
-- `app.js` includes logic to sort tasks by priority before displaying them.
+- `app.js` uses priority for filtering (it can return tasks by priority when requested), rather than automatically sorting all lists by priority.
 - `storage.js` saves priority along with other task fields.
 - Priority can be updated by editing a task, not just at creation.
 
@@ -202,3 +202,66 @@ My process was iterative: start with surface-level notes, then refine through gu
 The journal shows my progression from “just reading code” to “understanding the business logic.”
 
 This exercise taught me how to systematically explore, question, and document a codebase.
+
+# Exercise: Algorithm Deconstruction Challenge
+
+# Chosen Algorithm
+-Task priority sorting in JavaScript.
+
+-Functions: calculateTaskScore,    sortTasksByImportance, getTopPriorityTasks.
+ 
+ 1. The algorithm assigns a numeric score to each task using multiple factors:
+
+-Priority weights (LOW → URGENT).
+
+-Due date factor (overdue, today, next 2 days, next week).
+
+-Status adjustment (DONE, REVIEW).
+
+-Tag boost (blocker, critical, urgent).
+
+-Recent update boost (updated within 1 day).
+
+2. Tasks are then sorted by score, and the top N are returned.
+
+# Worked example
+Fix login bug → 83
+
+Submit financial report → 63
+
+Update project roadmap → 25
+
+Team meeting notes → 5
+
+// Example tasks for scoring
+Submit financial report → HIGH, due today, critical tag  
+Fix login bug → URGENT, overdue, blocker tag  
+Team meeting notes → LOW, due in 5 days, REVIEW  
+Update project roadmap → MEDIUM, no due date, updated today
+
+Sorted Output
+
+Fix login bug
+Submit financial report
+Update project roadmap
+Team meeting notes
+ 
+# Insights
+It’s a multi-factor scoring system, not just a simple sort.
+
+Urgent and overdue tasks rise sharply.
+
+Completed/review tasks are heavily penalized to reduce noise.
+
+Extensible: weights and signals can be adjusted or expanded.
+
+# Reflection Summary
+AI explanation impact → Clarified how each factor contributes numerically, not just conceptually.
+
+Remaining difficulties → Edge cases (no due date, conflicting signals, multiple tags).
+
+Explaining to juniors → “We give each task points based on urgency, deadline, and tags, then sort them so the highest points float to the top.”
+
+Testing understanding → Confirmed with worked example scores.
+
+Possible improvements → Configurable weights, handling recurring tasks, adaptive scoring with ML.
