@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 # CODE UNDERSTANDING JOURNAL
 
 # EXERCISE: CODE EXPLORE CHALLENGE
+=======
+# Code Understanding Journal
+
+>>>>>>> b11c6784a8b4500514819f93b6bf3cce65b9fe78
 ## Overview
 This task manager is organized around four main files:
 - `cli.js`: command-line interface for user input and output.
@@ -153,6 +158,7 @@ Based on my search, these files might be relevant, but I'm not sure:
 - How do users interact with priority through CLI commands?  
 - What happens when two tasks have the same priority?
 
+<<<<<<< HEAD
 ## Corrections and Clarifications
 
 - **No `User` class:** The codebase does not define a `User` domain object; ownership is implied by CLI usage but not implemented.
@@ -163,10 +169,13 @@ Based on my search, these files might be relevant, but I'm not sure:
 
 These corrections align the journal with the implementation in `models.js`, `app.js`, `storage.js`, and `cli.js`.
 
+=======
+>>>>>>> b11c6784a8b4500514819f93b6bf3cce65b9fe78
 Exercise 4
 
 Presentation Script (3–5 minutes)
 
+<<<<<<< HEAD
 1. High-level overview (20s)
 The project is a small CLI Task Manager with four modules: `cli.js` (input), `app.js` (orchestration), `models.js` (Task model), and `storage.js` (JSON persistence). Flow: input → orchestrator → model → storage → output.
 
@@ -185,6 +194,54 @@ Note: priority is used for filtering (not global auto-sorting) and is persisted 
 
 5. Closing (20s)
 Summarize: clear architecture, correct handling of priority and status, and a few small improvements that would increase robustness and feature completeness. Invite questions.
+=======
+1. High-Level Overview
+The application is a Task Manager built with four main components:
+
+cli.js → entry point for user commands
+
+app.js → orchestrates logic
+
+models.js → defines task structure
+
+storage.js → handles persistence
+
+➡ Together, they form a cycle: input → orchestration → data structure → persistence → feedback.
+
+2. Key Features
+Task Creation → User adds a task via CLI, app.js builds it using models.js, and storage.js saves it.
+
+Task Prioritization → Priority is set at creation, saved in storage, and used in app.js to filter tasks.
+
+Task Completion → User marks a task done, app.js calls storage.js to update status, and the change is persisted.
+
+3. Interesting Design Pattern
+Separation of Concerns → Each file has a distinct responsibility.
+
+This makes the system modular, easier to maintain, and clear to understand.
+
+Example: models.js only defines structure, while storage.js only handles persistence.
+
+4. Challenges & How Prompts Helped
+Challenge: Distinguishing between status and priority — I initially thought they overlapped.
+
+Prompts Helped:
+
+Prompt 1 guided me through basic feature exploration.
+
+Prompt 2 deepened my understanding with targeted questions.
+
+Prompt 3 connected code to domain concepts and business logic.
+
+Prompt 4 now consolidates everything into a clear narrative.
+
+5. Closing Reflection
+My process was iterative: start with surface-level notes, then refine through guided prompts.
+
+The journal shows my progression from “just reading code” to “understanding the business logic.”
+
+This exercise taught me how to systematically explore, question, and document a codebase.
+>>>>>>> b11c6784a8b4500514819f93b6bf3cce65b9fe78
 
 ## Exercise: Algorithm Deconstruction Challenge
 
@@ -212,6 +269,7 @@ Sorted output: Fix login bug, Submit financial report, Update project roadmap, T
 3. Junior dev explanation: “Give each task points, sort by highest.”
 4. Tested with worked example scores.
 5. Improvements: configurable weights, recurring tasks, adaptive scoring.
+<<<<<<< HEAD
 
 # EXERCISE: KNOWING WHERE TO START
 
@@ -912,3 +970,5 @@ Prompt adjustments: Needed to specify “include examples and edge cases” to g
 Effective format: README for developers, step‑by‑step guide for features, FAQ for quick answers.
 
 Workflow use: Start with AI‑generated drafts, refine manually, then publish in repo root (README.md) and docs folder (USER_GUIDE.md).
+=======
+>>>>>>> b11c6784a8b4500514819f93b6bf3cce65b9fe78
