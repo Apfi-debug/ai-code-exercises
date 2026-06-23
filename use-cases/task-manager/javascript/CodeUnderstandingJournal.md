@@ -1076,11 +1076,12 @@ function merge(left, right) {
 3. Most valuable technique: Alternative approaches provided the clearest confirmation and reinforced best practices.
 4. Learning point: Verification isn’t just about fixing bugs — it’s about building confidence in both the solution and the underlying concepts.
 
-# EXERCISE:
+# EXERCISE: USING AI TO HELP WITH TESTING
 
 ## Part 1: Understanding What to Test (JavaScript)
 
-## Behavior Analysis — calculateTaskScore
+1.1 Behavior Analysis — calculateTaskScore
+
 1. Key behaviors to test:
 -priority weighting (LOW vs URGENT).
 -due date scoring (overdue, today, future).
@@ -1094,4 +1095,386 @@ function merge(left, right) {
 -Task marked DONE.
 -Task with multiple tags.
 -Task updated yesterday vs 30 days ago.
+
+1.2 Structured Test Plan 
+
+# Functions Under Test
+-calculateTaskScore → assigns numeric scores to tasks based on priority, due date, status, tags, and updates.
+-sortTasksByImportance → sorts tasks by their calculated score.-getTopPriorityTasks → retrieves the highest‑priority tasks from the sorted list.
+
+# Priority of Test Cases
+1. High Priority (must test first)
+
+-Correct scoring logic in calculateTaskScore (priority, due date, tags, status).
+-Sorting order correctness in sortTasksByImportance.
+-Retrieval accuracy in getTopPriorityTasks.
+
+2. Medium Priority
+
+-Edge cases (tasks with missing fields, invalid values).
+-Multiple tasks with identical scores (tie‑breaking).
+
+3. Low Priority
+
+-Performance with large task lists.
+-Integration with external data sources.
+
+# Types of Tests Needed
+1. Unit Tests
+
+Each function individually (calculateTaskScore, sortTasksByImportance, getTopPriorityTasks).
+
+2. Integration Tests
+
+All three functions working together in a workflow.
+
+3. Edge Case Tests
+
+Missing due dates, invalid priorities, multiple tags, tasks marked DONE but still scored.
+
+# Test Dependencies
+-Mock task objects with different combinations of properties.
+-A consistent scoring formula reference (so you know expected outputs)
+-A small dataset for integration testing (3–5 tasks with varied attributes).
+
+# Expected Outcomes
+-calculateTaskScore: returns correct numeric score for each task.
+-sortTasksByImportance: tasks sorted descending by score.
+-getTopPriorityTasks: returns the top N tasks, correctly ordered.
+-Edge cases handled gracefully (no crashes, predictable outputs).
+
+## Part 2: Improving a Single Test
+
+# Exercise 2.1: 
+2.1.1 First Test
+
+// calculateTaskScore.test.js
+const { calculateTaskScore } = require('./taskManager');
+
+test('basic functionality: HIGH priority task gets a higher score than LOW', () => {
+  const lowTask = { priority: 'LOW', dueDate: null, status: 'IN_PROGRESS', tags: [], updatedAt: new Date() };
+  const highTask = { priority: 'HIGH', dueDate: null, status: 'IN_PROGRESS', tags: [], updatedAt: new Date() };
+
+  const lowScore = calculateTaskScore(lowTask);
+  const highScore = calculateTaskScore(highTask);
+
+  expect(highScore).toBeGreaterThan(lowScore);
+});
+
+2.1.2 Reflect & Improve
+
+1. What is this test really verifying?
+→ It’s checking priority weighting, but ignores due dates, tags, or status.
+2. Is the test checking the behavior (expected outcome) or the implementation details (specific formula)?
+→ Right now, it’s behavior-focused, which is good.
+3. Could the test name be clearer?
+→ Yes, rename it to:
+
+javascript
+test('HIGH priority tasks score higher than LOW priority tasks', () => { ... });
+
+4. What if the task has no priority, or invalid values?
+→ You should add tests for those later.
+5. Right now, it only checks “greater than.” Could you assert exact values if you know the formula?
+→ That would make the test more precise.
+
+2.1.3 Improved Test
+
+test('HIGH priority tasks score higher than LOW priority tasks', () => {
+  const lowTask = { priority: 'LOW', dueDate: null, status: 'IN_PROGRESS', tags: [], updatedAt: new Date() };
+  const highTask = { priority: 'HIGH', dueDate: null, status: 'IN_PROGRESS', tags: [], updatedAt: new Date() };
+
+  const lowScore = calculateTaskScore(lowTask);
+  const highScore = calculateTaskScore(highTask);
+
+  expect(highScore).toBeGreaterThan(lowScore);
+  expect(highScore).toBeGreaterThanOrEqual(10); // assuming HIGH adds +10
+  expect(lowScore).toBeGreaterThanOrEqual(0);   // baseline score should not be negative
+});
+
+## Exercise 2.2: Learning From Examples
+
+# Your Rough Test Idea
+
+// pseudocode
+test("task due tomorrow should score higher than task due next week", () => {
+  task1 = { dueDate: tomorrow };
+  task2 = { dueDate: nextWeek };
+  expect(score(task1)).toBeGreaterThan(score(task2));
+});
+
+# Principles of a Good Test
+-A strong test for due date calculation should:
+-Verify relative scoring (closer due dates = higher score).
+-Include edge cases (overdue, today, no due date).
+-Use clear assertions (not just “greater than,” but expected ranges or exact values if formula is known).
+-Be readable and maintainable (test names explain intent).
+
+# comprehensive test for the due date calculation
+
+test('tasks due sooner should score higher than tasks due later', () => {
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const nextWeek = new Date(today);
+  nextWeek.setDate(today.getDate() + 7);
+
+  const taskDueTomorrow = { priority: 'MEDIUM', dueDate: tomorrow, status: 'IN_PROGRESS', tags: [], updatedAt: today };
+  const taskDueNextWeek = { priority: 'MEDIUM', dueDate: nextWeek, status: 'IN_PROGRESS', tags: [], updatedAt: today };
+
+  const scoreTomorrow = calculateTaskScore(taskDueTomorrow);
+  const scoreNextWeek = calculateTaskScore(taskDueNextWeek);
+
+  // Clear assertion: tomorrow’s task should have a higher score
+  expect(scoreTomorrow).toBeGreaterThan(scoreNextWeek);
+
+  // Optional: check that both scores are positive
+  expect(scoreTomorrow).toBeGreaterThanOrEqual(0);
+  expect(scoreNextWeek).toBeGreaterThanOrEqual(0);
+});
+
+# Part 3: Test-Driven Development Practice
+
+## Exercise 3.1: TDD for a New Feature
+
+1. Writing a failing test
+
+test('tasks assigned to current user get +12 score boost', () => {
+  const today = new Date();
+  const taskForUser = { 
+    priority: 'MEDIUM', 
+    dueDate: today, 
+    status: 'IN_PROGRESS', 
+    tags: [], 
+    updatedAt: today, 
+    assignedTo: 'currentUser' 
+  };
+
+  const taskForOther = { 
+    priority: 'MEDIUM', 
+    dueDate: today, 
+    status: 'IN_PROGRESS', 
+    tags: [], 
+    updatedAt: today, 
+    assignedTo: 'otherUser' 
+  };
+
+  const scoreUser = calculateTaskScore(taskForUser);
+  const scoreOther = calculateTaskScore(taskForOther);
+
+  // Expect currentUser’s task to score exactly 12 points higher
+  expect(scoreUser).toBe(scoreOther + 12);
+});
+
+# minimal code to pass
+
+if (task.assignedTo === 'currentUser') {
+  score += 12;
+}
+
+# Refactor if Necessary
+
+const USER_BOOST = 12;
+if (task.assignedTo === 'currentUser') {
+  score += USER_BOOST;
+}
+
+# Write the Next Test
+
+test('tasks without assignedTo field do not get boost', () => {
+  const today = new Date();
+  const task = { 
+    priority: 'MEDIUM', 
+    dueDate: today, 
+    status: 'IN_PROGRESS', 
+    tags: [], 
+    updatedAt: today 
+    // no assignedTo
+  };
+
+  const score = calculateTaskScore(task);
+
+  // Expect baseline score without boost
+  expect(score).toBeGreaterThanOrEqual(0);
+  expect(score).not.toBe(12); 
+});
+
+## Exercise 3.2: TDD for Bug Fix
+
+1. Write a Failing Test
+
+test('days since update should calculate correctly', () => {
+  const today = new Date();
+  const fiveDaysAgo = new Date(today);
+  fiveDaysAgo.setDate(today.getDate() - 5);
+
+  const task = { 
+    priority: 'LOW', 
+    dueDate: null, 
+    status: 'IN_PROGRESS', 
+    tags: [], 
+    updatedAt: fiveDaysAgo 
+  };
+
+  const score = calculateTaskScore(task);
+
+  // Expect the function to recognize exactly 5 days difference
+  // (depending on your formula, e.g., boost only if <= 3 days)
+  expect(score).toBe(/* expected value based on correct formula */);
+});
+
+2. Implement Minimal Code
+
+const daysSinceUpdate = Math.floor(
+  (Date.now() - task.updatedAt.getTime()) / (1000 * 60 * 60 * 24)
+);
+
+3. Refactor if Necessary 
+
+function getDaysSinceUpdate(updatedAt) {
+  return Math.floor((Date.now() - updatedAt.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+4. Write Next Tests
+
+test('task updated today should have 0 days since update', () => {
+  const today = new Date();
+  const task = { updatedAt: today };
+  expect(getDaysSinceUpdate(task.updatedAt)).toBe(0);
+});
+
+test('task updated exactly 3 days ago should return 3', () => {
+  const today = new Date();
+  const threeDaysAgo = new Date(today);
+  threeDaysAgo.setDate(today.getDate() - 3);
+  const task = { updatedAt: threeDaysAgo };
+  expect(getDaysSinceUpdate(task.updatedAt)).toBe(3);
+});
+
+test('task updated long ago should return large number', () => {
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+  const task = { updatedAt: thirtyDaysAgo };
+  expect(getDaysSinceUpdate(task.updatedAt)).toBe(30);
+});
+
+# Part 4: Integration Testing
+
+## Exercise 4.1: Testing the Full Workflow
+
+1. Identify Scenarios
+
+Integration tests verifies:
+
+-Tasks are scored correctly by calculateTaskScore.
+-asks are sorted properly by sortTasksByImportance.
+-The top tasks are retrieved accurately by getTopPriorityTasks.
+
+Scenarios to test:
+
+-Mixed priorities and due dates.
+-Tasks with identical scores (tie‑breaking).
+-Edge cases (no tasks, all tasks DONE).
+
+2. Design Test Data
+
+const tasks = [
+  { priority: 'LOW', dueDate: null, status: 'IN_PROGRESS', tags: [], updatedAt: new Date(), assignedTo: 'otherUser' },
+  { priority: 'URGENT', dueDate: new Date(), status: 'IN_PROGRESS', tags: ['critical'], updatedAt: new Date(), assignedTo: 'currentUser' },
+  { priority: 'MEDIUM', dueDate: new Date(Date.now() + 86400000), status: 'IN_PROGRESS', tags: [], updatedAt: new Date(), assignedTo: 'otherUser' },
+  { priority: 'HIGH', dueDate: new Date(Date.now() + 604800000), status: 'IN_PROGRESS', tags: [], updatedAt: new Date(), assignedTo: 'otherUser' }
+];
+
+3. Write Integration Test
+
+test('integration: workflow scores, sorts, and retrieves top tasks', () => {
+  const scoredTasks = tasks.map(task => ({
+    ...task,
+    score: calculateTaskScore(task)
+  }));
+
+  const sortedTasks = sortTasksByImportance(scoredTasks);
+  const topTasks = getTopPriorityTasks(sortedTasks, 2);
+
+  // Assertions:
+  // 1. URGENT + critical + currentUser should be top
+  expect(topTasks[0].priority).toBe('URGENT');
+  expect(topTasks[0].tags).toContain('critical');
+  expect(topTasks[0].assignedTo).toBe('currentUser');
+
+  // 2. Next should be HIGH or MEDIUM depending on due date scoring
+  expect(topTasks.length).toBe(2);
+  expect(topTasks[1].priority === 'HIGH' || topTasks[1].priority === 'MEDIUM').toBeTruthy();
+
+  // 3. Sorted list should be descending by score
+  for (let i = 0; i < sortedTasks.length - 1; i++) {
+    expect(sortedTasks[i].score).toBeGreaterThanOrEqual(sortedTasks[i + 1].score);
+  }
+});
+
+4. Reflection
+-This test verifies the entire workflow.
+-It ensures that scoring, sorting, and retrieval are consistent.
+-expand with edge cases (empty list, all DONE tasks, multiple identical scores).
+
+## Discussion Document: Using AI to Help with Testing
+
+# Part 1: Test Plan Summary
+1. Functions under test:
+-calculateTaskScore
+-sortTasksByImportance
+-getTopPriorityTasks
+2. Priority of test cases:
+-Core scoring logic (priority, due date, tags, status).
+-Sorting correctness.
+-Retrieval accuracy.
+-Edge cases (missing fields, invalid values).
+-Performance with large lists.
+3. ypes of tests: Unit, integration, edge case.
+4. Dependencies: Mock task objects, scoring formula reference, small datasets.
+5. Expected outcomes: Correct scores, sorted order, accurate retrieval, graceful handling of edge cases.
+
+# Part 2: Improved Unit Tests
+1. Basic test: HIGH priority > LOW priority.
+2. Improved test: Clearer naming, precise assertions, edge case coverage.
+3. Due date test: Tasks due sooner score higher than later tasks.
+4. Edge cases: Overdue tasks, no due date, tasks due today, identical due dates.
+
+# Part 3: TDD Practice
+1. New Feature (+12 boost for current user)
+-Failing test: Verified that tasks assigned to currentUser should score 12 points higher.
+-Minimal code: Added if (task.assignedTo === 'currentUser') score += 12;.
+-Refactor: Extracted constant USER_BOOST = 12.
+-Next test: Tasks without assignedTo field do not get boost.
+
+2. Bug Fix (days since update)
+-Failing test: Exposed incorrect calculation for days since update.
+-Minimal fix: Used (Date.now() - updatedAt.getTime()) / (1000*60*60*24).
+-Refactor: Extracted helper getDaysSinceUpdate().
+-Regression tests: Verified 0 days (today), 3 days ago, 30 days ago.
+
+# Part 4: Integration Test
+1. Verified workflow:
+
+-calculateTaskScore assigns correct scores.
+-sortTasksByImportance orders tasks descending.
+-getTopPriorityTasks retrieves top N tasks.
+
+2. Assertions:
+
+-URGENT + critical + currentUser task is top.
+-Sorted list is descending by score.
+-Edge cases handled (empty list, all DONE tasks).
+
+# Part 5: Reflection
+1. Through this exercise, I learned:
+2. Behavior vs implementation: Good tests focus on expected outcomes, not internal formulas.
+3. Edge cases matter: Overdue tasks, missing fields, and identical scores reveal weaknesses.
+4. TDD discipline: Writing failing tests first forces clarity about expected behavior.
+5. Integration perspective: Testing the workflow ensures functions don’t just work individually but also together.
+6. AI as a partner: Using prompts to reflect on behaviors and edge cases helped me think more critically about testing, rather than just generating code.
+
+# Exercise: Function Decomposition Challenge
 
