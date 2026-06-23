@@ -186,7 +186,7 @@ Note: priority is used for filtering (not global auto-sorting) and is persisted 
 5. Closing (20s)
 Summarize: clear architecture, correct handling of priority and status, and a few small improvements that would increase robustness and feature completeness. Invite questions.
 
-## Exercise: Algorithm Deconstruction Challenge
+## EXERCISE: ALGORITHM DECUNSTRUCTION CHALLENGE
 
 ### Algorithm Chosen
 Task priority sorting in JavaScript (calculateTaskScore, sortTasksByImportance, getTopPriorityTasks).
@@ -849,7 +849,7 @@ Most effective format: OpenAPI for machine readability, Markdown for developer o
 
 Workflow use: Start with AI‑generated docs, refine manually, then publish in both Markdown and OpenAPI formats for team use.
 
-# Exercise: README DOCCUMENTATION
+# EXERCISE: README DOCCUMENTATION
 
 ## Prompt 1
 Comprehensive README Generation
@@ -1476,5 +1476,183 @@ test('integration: workflow scores, sorts, and retrieves top tasks', () => {
 5. Integration perspective: Testing the workflow ensures functions don’t just work individually but also together.
 6. AI as a partner: Using prompts to reflect on behaviors and edge cases helped me think more critically about testing, rather than just generating code.
 
-# Exercise: Function Decomposition Challenge
+# EXERCISE: UNDERSTANDING WHAT TO CHANGE WITH AI
+
+## Exercise 1: Code Readability Improvement (Java)
+
+1. Identified Issues
+-Class names: UserMgr → should be UserManager for clarity.
+-Variable names: u_list → users; db → databaseConnection.
+-Method names: a → addUser; f → findUserByUsername.
+-Class U → should be User.
+-SQL injection risk: concatenating strings directly into SQL.
+
+2. Suggested improvements by AI
+
+class UserManager {
+    private List<User> users;
+    private DBConn databaseConnection;
+
+    public UserManager(DBConn databaseConnection) {
+        this.databaseConnection = databaseConnection;
+        this.users = new ArrayList<>();
+    }
+
+    public boolean addUser(String username, String password, String email) {
+        if (username.length() < 3 || password.length() < 8 || !email.contains("@")) {
+            return false;
+        }
+
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return false;
+            }
+        }
+
+        User newUser = new User(username, password, email);
+        users.add(newUser);
+        return databaseConnection.execute(
+            "INSERT INTO users VALUES ('" + username + "', '" + password + "', '" + email + "')"
+        );
+    }
+
+    public User findUserByUsername(String username) {
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
+}
+
+class User {
+    private String username;
+    private String password;
+    private String email;
+
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+    public String getEmail() { return email; }
+}
+
+## Exercise 2: Function Refactoring 
+1. Identified Issues
+-The function is too long and mixes validation, pricing, inventory updates, and reporting.
+-Hard to test individual parts.
+
+2. AI-Suggested Refactoring
+-validate_order(order, inventory, customer_data)
+-calculate_price(order, inventory, customer_data)
+-calculate_shipping(price, customer_data)
+-apply_tax(price)
+-update_inventory(item_id, quantity, inventory)
+
+## Exercise 3: Code Duplication Detection (JavaScript)
+1. Identified Issues
+-Repeated loops for average and highest calculations.
+-Same logic applied to age, income, and score.
+
+2. AI-Suggested Consolidation
+
+function calculateStats(userData, key) {
+  let total = 0;
+  let highest = userData[0][key];
+
+  for (let i = 0; i < userData.length; i++) {
+    total += userData[i][key];
+    if (userData[i][key] > highest) {
+      highest = userData[i][key];
+    }
+  }
+
+  return {
+    average: total / userData.length,
+    highest: highest
+  };
+}
+
+function calculateUserStatistics(userData) {
+  return {
+    age: calculateStats(userData, 'age'),
+    income: calculateStats(userData, 'income'),
+    score: calculateStats(userData, 'score')
+  };
+}
+
+## Reflection
+-Most useful strategy: Function Refactoring — breaking down large functions into smaller ones makes testing and debugging far easier.
+-AI surprises: It often catches naming conventions and duplication patterns that humans overlook.
+-Disagreements: Sometimes AI suggests over-engineering (too many helper functions). Balance readability with simplicity.
+-Adaptation: Tailor prompts to your stack — e.g., emphasize Pythonic idioms or JavaScript ES6 features.
+-Safeguards: Always run tests before refactoring production code. AI suggestions should be reviewed by humans.
+
+# EXERCISE: FUNCTION DECOMPOSITION CHALLENGE.
+
+## JavaScript validation function
+
+1. Distinct Responsibilities
+-The original validateUserData function is handling too many jobs:
+-Required field checks (registration vs profile update)
+-Username validation (length, characters, uniqueness)
+-Password validation (length, complexity, confirmation)
+-Email validation (format, uniqueness)
+-Date of birth validation (valid date, age range)
+-Address validation (required fields, postal code formats)
+-Phone validation (basic regex)
+-Custom validations (user-defined rules)
+
+2. Decomposition Plan
+-Clear names and single responsibilities
+
+function validateRequiredFields(userData, requiredFields) { ... }
+function validateUsername(username, options) { ... }
+function validatePassword(password, confirmPassword) { ... }
+function validateEmail(email, options) { ... }
+function validateDateOfBirth(dob) { ... }
+function validateAddress(address) { ... }
+function validatePhone(phone) { ... }
+function applyCustomValidations(userData, customValidations) { ... }
+
+3. Refactored Main Function
+
+function validateUserData(userData, options = {}) {
+  const errors = [];
+  const isRegistration = options.isRegistration || false;
+
+  if (isRegistration) {
+    errors.push(...validateRequiredFields(userData, ['username', 'email', 'password', 'confirmPassword']));
+    errors.push(...validateUsername(userData.username, options));
+    errors.push(...validatePassword(userData.password, userData.confirmPassword));
+  } else {
+    errors.push(...validateRequiredFields(userData, ['firstName', 'lastName', 'dateOfBirth', 'address']));
+  }
+
+  errors.push(...validateEmail(userData.email, options));
+  errors.push(...validateDateOfBirth(userData.dateOfBirth));
+  errors.push(...validateAddress(userData.address));
+  errors.push(...validatePhone(userData.phone));
+  errors.push(...applyCustomValidations(userData, options.customValidations));
+
+  return errors.filter(Boolean);
+}
+
+4. Documentation and Benefits
+Readability: Each helper name explains its purpose.
+
+Maintainability: Easier to update rules (e.g., password complexity) without touching the main function.
+
+Reusability: Functions like validateEmail or validatePhone can be reused in other modules.
+
+Testability: Each helper can be unit-tested independently.
+
+# Reflector
+
+Breaking down the JavaScript validation function made the code far easier to read. The hardest part was untangling nested conditionals, especially in password and address validation. The most reusable helper is validateEmail, since email checks are common across projects. I’d adapt these prompts to my own stack by emphasizing ES6 features like arrow functions and array methods. Before applying AI-suggested refactoring in production, I’d safeguard with unit tests and peer reviews
 
