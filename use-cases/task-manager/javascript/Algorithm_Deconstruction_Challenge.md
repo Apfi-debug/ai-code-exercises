@@ -1,1 +1,0 @@
-## Exercise: Algorithm Deconstruction Challenge 

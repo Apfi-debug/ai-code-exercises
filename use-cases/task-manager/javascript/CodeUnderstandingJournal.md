@@ -849,66 +849,310 @@ Most effective format: OpenAPI for machine readability, Markdown for developer o
 
 Workflow use: Start with AI‑generated docs, refine manually, then publish in both Markdown and OpenAPI formats for team use.
 
-# EXERCISE: README DOCCUMENTATION
+# EXERCISE: README AND USER GUIDE DOCCUMENTATION
 
-## Prompt 1
-Comprehensive README Generation
+1. TaskCLI
+A powerful command‑line task management tool designed for developers who prefer to stay in the terminal.
 
-Draft README sections:
+## Part A: Comprehensive README
 
-Overview → Short description of Task Manager system.
+2.2 Features
+-Task Management: Create, update, and track tasks directly from your terminal
+-Organization: Group tasks into projects and add tags for easy filtering
+-Prioritization: Set priorities and deadlines to stay focused on what matters
+-Notifications: Receive daily summary emails of pending tasks
+-GitHub Integration: Link tasks to GitHub issues and pull requests
+-Time Tracking: Track time spent on different tasks and generate reports
 
-Installation → Clone repo, run npm install, start app.
+2.3 Installation
 
-Usage → CLI commands (add, list, delete, export).
+-Node.js 10.0 or higher
+-npm or yarn
 
-Features → Task creation, prioritization, overdue/abandoned rule, CSV export.
+2.4 Quick Install
 
-Contributing → Guidelines for developers.
+npm install -g task-cli
+taskcli --version
 
-License → Basic license info.
+2.5 Manual Installation
 
-## Step-by-step Guide Creation
+git clone https://github.com/yourusername/task-cli.git
+cd task-cli
+npm install
+npm link
 
--Feature chosen: Export tasks to CSV.
-Guide includes:
+2.6 Configuration
 
--Run CLI command node cli.js export.
+On first run, TaskCLI will create a configuration file at ~/.taskcli/config.json. This file can be eddited using configuration command:
 
--App calls app.js → handleExport().
+taskcli config set email your.email@example.com
+taskcli config set githubToken your-github-token
+Option	Description	Default
+email	Email for notifications	None
+githubToken	GitHub Personal Access Token	None
+defaultProject	Default project for new tasks	"inbox"
+reminderTime	Time for daily reminder emails	"08:00"
+dateFormat	Date format for display	"YYYY-MM-DD"
 
--storage.js writes tasks to tasks.csv.
+2.7 Usage
 
--Output file appears in project root.
+Basic Commands
 
-Example:
-"node cli.js export"
--Creates tasks.csv with task data.
+taskcli add "Implement new feature"
+taskcli list
+taskcli complete 42
+taskcli show 42
 
-## FAQ Document Creation prompt 3
+2.8 Managing Projects
 
-Sample FAQs:
+taskcli project add "Website Redesign"
+taskcli project list
+taskcli add "Design homepage" --project "Website Redesign"
 
-Q: How do I install the Task Manager?  
-A: Clone repo, run npm install, then node cli.js.
+2.9 Using Tags
 
-Q: Where are tasks stored?  
-A: In tasks.json file.
+taskcli tag 42 --add urgent frontend
+taskcli list --tags urgent
 
-Q: How do I mark a task as abandoned?  
-A: The system automatically marks overdue tasks (>7 days) as abandoned unless high priority.
+2.10 Time Tracking
 
-Q: Can I export tasks?  
-A: Yes, run node cli.js export to generate tasks.csv.
+taskcli timer start 42
+taskcli timer stop
+taskcli report time --from 2023-01-01 --to 2023-01-31
 
-Q: What happens if dueDate is missing?  
-A: Task is treated as non‑urgent, no overdue logic applied.
+2.11 Troubleshooting
 
-## Reflection
-1. Challenging parts: Deciding how much detail belongs in README vs. User Guide.
-2. Prompt adjustments: Needed to specify “include examples and edge cases” to get complete docs.
-3. Effective format: README for developers, step‑by‑step guide for features, FAQ for quick answers.
-4. Workflow use: Start with AI‑generated drafts, refine manually, then publish in repo root (README.md) and docs folder (USER_GUIDE.md).
+-Command Not Found: Ensure your npm global bin directory is in your PATH.
+-Authentication Errors: Verify your GitHub token has the correct permissions (repo scope).
+-Database Errors: Reset the database with taskcli db:reset.
+
+2.12 Contributing
+
+-Fork the repository
+-Create your feature branch (git checkout -b feature/amazing-feature)
+-Commit your changes (git commit -m 'Add some amazing feature')
+-Push to the branch (git push origin feature/amazing-feature)
+-Open a Pull Request
+
+2.13 License
+
+This project is licensed under the MIT License — see the LICENSE file for details.
+
+# Part B: Step-by-step guide
+
+## Requirements to have before setting up GitHub Integration in TaskCLI
+
+# Before starting, make sure you have:
+
+-TaskCLI installed (version 2.0 or higher)
+
+-A GitHub account
+
+-Access to the repositories you want to integrate
+
+# Step 1: Create a GitHub Personal Access Token
+
+1. Log in to your GitHub account
+2. Navigate to Settings > Developer settings > Personal access tokens
+3. Click Generate new token
+4. Name the token (e.g., “TaskCLI Integration”)
+5. Select scopes:
+   -repo (full control of     private repositories)
+   -read:user (read user information)
+6. Click Generate token
+
+7. Copy the token immediately
+GitHub only shows it once
+
+# Step 2: Configure TaskCLI with Your Token
+
+1. Open your terminal
+
+2. Run:
+
+taskcli config set githubToken your-token
+
+3. Verify configuration:
+
+taskcli config list
+
+# Step 3: Link a GitHub Repository
+
+1. Create or use an existing project:
+
+
+taskcli project add "Website Frontend"
+
+2. Link the project to a repository:
+
+taskcli project link "Website Frontend" --repo "username/repository"
+
+3. Confirm link:
+
+taskcli project show "Website Frontend"
+
+# Step 4: Link Tasks to GitHub Issues
+
+1. Import an issue as a task:
+
+taskcli github import --repo "username/repository" --issue 42
+
+2. Reference an issue when creating a task:
+
+taskcli add "Fix navigation bug" --github-issue 42
+
+3. Link an existing task to an issue:
+
+taskcli link 24 --github-issue 42
+
+# Step 5: Use GitHub Integration Features
+
+1. Sync issues:
+
+taskcli github sync
+
+2. Push updates to GitHub:
+
+taskcli complete 24 --push-github
+
+3. View GitHub details:
+
+taskcli show 24 --github-details
+
+# Troubleshooting
+1. Authentication failed → Check token permissions or regenerate a new token
+2. Repository not found → Verify repository name and access rights
+3. Changes not syncing → Run taskcli github sync --force and check logs with taskcli log show
+
+# Part C: TaskCLI (FAQ)
+ # Start
+Q: What is TaskCLI?  
+A: TaskCLI is a command‑line task management tool for developers. It lets you create, organize, and track tasks directly in your terminal.
+
+Q: How do I install TaskCLI?  
+A: Install globally with npm:
+
+npm install -g task-cli
+
+Q: What are the system requirements?  
+A: Node.js 10.0 or higher and npm. Works on Windows, macOS, and Linux.
+
+Q: How do I get started after installation?  
+A: Run taskcli init to set up configuration, then create your first task:
+
+taskcli add "My first task"
+
+# Features and Usage
+
+Q: How do I create a new task?  
+A: Use the add command:
+
+taskcli add "Implement login page"
+
+Q: How do I view tasks?  
+A: Run:
+
+taskcli list
+
+Q: Can I set due dates?  
+A: Yes, when creating or updating tasks:
+
+taskcli add "Write docs" --due 2023-12-31
+taskcli update 42 --due 2023-12-31
+
+Q: What are projects and tags?  
+A: Projects group related tasks, tags categorize tasks across projects. Example:
+
+taskcli project add "Website Redesign"
+taskcli add "Fix bug" --tags urgent backend
+
+# Time Tracking
+
+Q: How do I track time on a task?  
+A: Start and stop timers:
+
+taskcli timer start 42
+taskcli timer stop
+
+Q: Can I add time manually?  
+A: Yes:
+
+taskcli timer add 42 --minutes 30 --date 2023-01-15
+
+Q: How do I view reports?  
+A: Generate reports:
+
+taskcli report time --from 2023-01-01 --to 2023-01-31
+
+# GitHub Integration
+
+Q: How do I link TaskCLI to GitHub?  
+A: Configure your token:
+
+taskcli config set githubToken your-github-token
+
+Q: Can I import GitHub issues as tasks?
+A: Yes:
+
+taskcli github import --repo "username/repository" --issue 42
+
+Q: Do status changes sync with GitHub?  
+A: Yes, completing a linked task can close the GitHub issue:
+
+taskcli complete 42 --push-github
+
+# Troubleshooting
+
+Q: TaskCLI command not found after installation  
+A: Ensure your npm global bin directory is in your PATH (npm bin -g).
+
+Q: Database errors or corruption  
+A: Reset with:
+
+taskcli db:reset
+
+Q: Email notifications not working  
+A: Verify configuration:
+
+taskcli config list
+taskcli email:test
+
+Q: How do I uninstall TaskCLI completely?  
+A:
+npm uninstall -g task-cli
+Then remove the data directory (~/.taskcli/ or %APPDATA%\taskcli\ on Windows).
+
+# Advanced Features
+
+Q: Can I create recurring tasks?  
+A: Yes:
+
+taskcli add "Weekly report" --recurring weekly --weekday friday
+
+Q: How do I back up my data?  
+A: Export and import:
+
+taskcli export --format json --output backup.json
+taskcli import backup.json
+
+Q: Can I sync across multiple computers?  
+A: Yes, enable cloud sync:
+
+taskcli sync enable
+
+Q: Is there an API?  
+A: Yes, start the API server:
+
+taskcli api start
+Documentation available at http://localhost:3000/api-docs
+
+# Reflection 
+
+Documenting TaskCLI taught me that clarity is key. The hardest part was writing the step‑by‑step guide, since I had to break technical commands into simple, beginner‑friendly steps. I adjusted prompts to include requirements and troubleshooting, which made the guide more useful.
+
+Creating the FAQ showed me the importance of anticipating user problems — not just listing features, but answering real questions like installation errors or GitHub sync issues.
+
+Overall, I learned how structure (README, guide, FAQ) creates a complete documentation set. This approach will help me in future projects by making my tools easier to understand and use.
 
 # Exercise: ERROR DIAGNOSIS CHALLENGE
 
@@ -1655,4 +1899,65 @@ Testability: Each helper can be unit-tested independently.
 # Reflector
 
 Breaking down the JavaScript validation function made the code far easier to read. The hardest part was untangling nested conditionals, especially in password and address validation. The most reusable helper is validateEmail, since email checks are common across projects. I’d adapt these prompts to my own stack by emphasizing ES6 features like arrow functions and array methods. Before applying AI-suggested refactoring in production, I’d safeguard with unit tests and peer reviews
+
+# EXERCISE: DESIGN PATTERN IMPLEMETATION CHALLENGE
+
+## Reflection answers
+1. Maintainability: The pattern reduced duplication, organized logic into reusable components, and made the code easier to read and extend.
+2. Future changes: Adding new features or integrations will be simpler and less risky since they can be introduced without rewriting the whole system.
+3. Unexpected challenges: Restructuring the original code while preserving behavior was tricky, and it required careful testing and choosing the right level of abstraction.
+
+# EXERCISE: APPLYING AI TO DEEPEN PROGRAMMING LANGUAGE UNDERSTANDING
+
+# Activity 1: Idiomatic Code Transformation
+Learning 1: Writing idiomatic code improves readability and makes it easier for others to understand.
+
+Learning 2: Using built‑in language features reduces boilerplate and prevents reinventing the wheel.
+
+Learning 3: Seeing side‑by‑side comparisons helped me recognize best practices I wasn’t applying before.
+
+# Activity 2: Code Quality Detective
+Learning 1: Reviewing older code highlighted common mistakes like poor naming and duplicated logic.
+
+Learning 2: Creating a checklist gave me a practical tool for future reviews.
+
+Learning 3: Understanding why improvements matter (performance, readability, maintainability) made me more intentional in my coding.
+
+# Activity 3: Understanding Language Feature
+Learning 1: Exploring advanced features (like decorators or generators) expanded my toolkit beyond basics.
+
+Learning 2: Practical use cases showed me how these features solve real problems.
+
+Learning 3: Implementing a small project helped me avoid common mistakes and reinforced the concept.
+
+# Discussion Themes
+Common themes included: the importance of readability, the value of refactoring, and how AI prompts accelerate learning.
+
+Sharing code changes helped me to see different approaches to the same problem.
+
+# EXERCISE: LEARNING A NEW PROGRAMMING LANGUAGE WITH AI
+
+## Reflection answers
+
+1. Effective strategies: The four‑step prompting strategy was the most effective because it gave me a clear path from understanding concepts to implementing and verifying them. It kept my learning structured and prevented me from rushing into code without context.
+
+2. Surprises: I was surprised by how different the target language’s philosophy was compared to my source language, especially in how it handles features I assumed worked the same way. This made me realize the importance of adjusting mental models early.
+
+3. Mental models: My source language habits helped me grasp syntax quickly, but sometimes they caused misconceptions when I expected similar behavior. Recognizing these differences was key to avoiding mistakes.
+
+4. Next time: Next time, I would spend more time exploring conceptual differences before coding. This would help me avoid confusion and make my practice sessions more efficient.
+
+5. Remaining gaps: I still need to deepen my understanding of advanced features and idiomatic best practices. Building more projects will help me close these gaps and gain confidence in real‑world use.
+
+# EXERCISE: UNDERSTANDING FASTAPI CODE PARTTERNS
+
+## Reflection answers
+
+1. Architecture understanding: Implementing the logging feature helped me see how the repository, service, and dependency injection layers fit together. It showed me how new functionality can be added without breaking the existing flow.
+
+2. Useful design patterns: The repository pattern and dependency injection were the most useful because they separated concerns and made the code easier to extend. Middleware also stood out as a clean way to add cross‑cutting features like timing or logging.
+
+3. Explaining repository & DI: I would explain the repository pattern as a way to centralize database operations, and dependency injection as a way to provide resources (like sessions or services) automatically without hard‑coding them. Together, they make the code more modular and testable.
+
+4. Tracing execution flow: Tracing the request flow for /admin/users/ helped me understand where authentication, authorization, and middleware fit in. It clarified exactly where new logic like logging should be added.
 
